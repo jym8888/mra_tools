@@ -1,13 +1,27 @@
 .PHONY: default
 default: all
 
-VERSION = v86A-2019-12
-XMLDIR  = v8.6
+XMLDIR  = v8.4
 
 A64    = ${XMLDIR}/ISA_A64_xml_${VERSION}
 A32    = ${XMLDIR}/ISA_AArch32_xml_${VERSION}
 SYSREG = ${XMLDIR}/SysReg_xml_${VERSION}
-
+ifeq ($(XMLDIR),v8.4)
+A64    = ${XMLDIR}/ISA_v84A_A64_xml_00bet7
+SYSREG = ${XMLDIR}/SysReg_v84A_xml-00bet7
+endif
+ifeq ($(XMLDIR),v8.5)
+VERSION = v85A-2019-06
+A64    = ${XMLDIR}/ISA_A64_xml_${VERSION}
+A32    = ${XMLDIR}/ISA_AArch32_xml_${VERSION}
+SYSREG = ${XMLDIR}/SysReg_xml_${VERSION}
+endif
+ifeq ($(XMLDIR),v8.6)
+VERSION = v86A-2019-12
+A64    = ${XMLDIR}/ISA_A64_xml_${VERSION}
+A32    = ${XMLDIR}/ISA_AArch32_xml_${VERSION}
+SYSREG = ${XMLDIR}/SysReg_xml_${VERSION}
+endif
 
 FILTER =
 # FILTER = --filter=usermode.json
@@ -16,7 +30,7 @@ arch/regs.asl: ${SYSREG}
 	mkdir -p arch
 	bin/reg2asl.py $< -o $@
 
-arch/arch.asl arch/arch.tag arch/arch_instrs.asl arch/arch_decode.asl: ${A32} ${A64}
+arch/arch.asl arch/arch.tag arch/arch_instrs.asl arch/arch_decode.asl: ${A64}
 	mkdir -p arch
 	bin/instrs2asl.py --altslicesyntax --demangle --verbose -oarch/arch $^ ${FILTER}
 	patch -Np0 < arch.patch
